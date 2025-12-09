@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animal Kingdom</title>
+    <title>Animal Kingdom 🦁</title>
     <script src="data.js"></script> 
     <style>
         :root {
@@ -32,12 +32,31 @@
         /* --- Header --- */
         header { text-align: center; margin-top: 20px; }
         h1 { color: var(--dark-green); font-size: 3rem; margin-bottom: 5px; text-shadow: 2px 2px 0px #fff; letter-spacing: 2px; }
+        
         .scoreboard {
             display: flex; gap: 20px; font-size: 1.2rem; font-weight: bold;
             background: white; padding: 10px 20px; border-radius: 50px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); align-items: center;
         }
         .score-box span { color: var(--accent-orange); }
+
+        /* Game Mode Selector */
+        .mode-selector {
+            display: flex; gap: 10px; align-items: center;
+            background: white; padding: 8px 15px; border-radius: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-top: 15px;
+        }
+        .mode-selector label { font-weight: bold; color: var(--text-color); font-size: 0.9rem; }
+        .mode-btn {
+            padding: 8px 16px; border: 2px solid var(--primary-green);
+            background: white; border-radius: 20px; cursor: pointer;
+            font-weight: bold; transition: all 0.2s; font-size: 0.85rem;
+        }
+        .mode-btn:hover { background: var(--jungle-bg); }
+        .mode-btn.active {
+            background: var(--primary-green); color: white;
+            border-color: var(--dark-green);
+        }
 
         /* --- Game Area --- */
         #game-container {
@@ -65,19 +84,16 @@
             transition: transform 0.3s ease;
         }
 
-        /* NEW IMAGE STYLING */
         .animal-image {
-            width: 250px; 
-            height: 250px;
-            object-fit: cover; /* Ensures the image fills the box without stretching */
-            border-radius: 15px;
-            margin: 0 auto 15px auto;
-            display: block;
-            border: 4px solid var(--dark-green);
-            background-color: #eee; /* Light gray background while loading */
+            width: 250px; height: 250px; object-fit: cover;
+            border-radius: 15px; margin: 0 auto 15px auto; display: block;
+            border: 4px solid var(--dark-green); background-color: #eee;
         }
 
-        .animal-name { font-size: 2.5rem; font-weight: 800; color: var(--dark-green); text-transform: uppercase; margin-bottom: 5px; }
+        .animal-name { 
+            font-size: 2.5rem; font-weight: 800; color: var(--dark-green); 
+            text-transform: uppercase; margin-bottom: 5px; 
+        }
 
         /* Categories Grid */
         .categories-grid {
@@ -91,7 +107,9 @@
             display: flex; flex-direction: column; justify-content: center;
             align-items: center; min-height: 100px;
         }
-        .category-card:hover:not(.disabled) { transform: translateY(-5px); border-bottom: 5px solid var(--primary-green); }
+        .category-card:hover:not(.disabled) { 
+            transform: translateY(-5px); border-bottom: 5px solid var(--primary-green); 
+        }
         .category-card.disabled {
             background-color: #e0e0e0; color: #999; cursor: not-allowed;
             border-bottom: 5px solid #ccc; transform: none; opacity: 0.6;
@@ -118,6 +136,7 @@
             display: flex; align-items: center; justify-content: center; transition: all 0.2s;
         }
         .info-icon:hover { background: var(--accent-orange); color: white; border-color: var(--accent-orange); }
+        
         .controls { margin-top: 40px; margin-bottom: 20px; }
         .btn-reset {
             background-color: #e74c3c; color: white; border: none; padding: 10px 25px;
@@ -145,6 +164,11 @@
         <div class="score-box">Current: <span id="current-score">0</span></div>
         <div class="score-box">Best: <span id="high-score">0</span></div>
     </div>
+    <div class="mode-selector">
+        <label>Mode:</label>
+        <button class="mode-btn active" onclick="setGameMode('random')">Random</button>
+        <button class="mode-btn" onclick="setGameMode('curated')">Curated</button>
+    </div>
 </header>
 
 <div id="game-container">
@@ -152,7 +176,6 @@
     
     <div class="animal-display" id="animal-card">
         <img src="" alt="Animal" class="animal-image" id="animal-img">
-        
         <div class="animal-name" id="animal-name">Loading...</div>
         <div style="margin-top:10px; color:#777; font-size: 1rem;">Select the best remaining category!</div>
     </div>
@@ -179,15 +202,64 @@
     const GAME_DATA = GAME_CONFIG.animals;
     const ANIMAL_NAMES = Object.keys(GAME_DATA);
 
+    // Calculate max possible score for each animal
+    function getAnimalMaxScore(animalName) {
+        const scores = GAME_DATA[animalName];
+        let maxScore = 0;
+        for (let cat in scores) {
+            if (cat !== 'image' && scores[cat] > maxScore) {
+                maxScore = scores[cat];
+            }
+        }
+        return maxScore;
+    }
+
+    // Get curated animal pool (animals that can achieve 600+ with 8 picks)
+    function getCuratedAnimalPool() {
+        const animalScores = ANIMAL_NAMES.map(name => ({
+            name: name,
+            maxScore: getAnimalMaxScore(name)
+        }));
+        
+        // Sort by max score descending
+        animalScores.sort((a, b) => b.maxScore - a.maxScore);
+        
+        // Take animals where top 8 can reach 600+
+        const top8Sum = animalScores.slice(0, 8).reduce((sum, a) => sum + a.maxScore, 0);
+        
+        if (top8Sum >= 600) {
+            // Return animals that have maxScore >= 75 (so 8 of them can hit 600)
+            return animalScores.filter(a => a.maxScore >= 75).map(a => a.name);
+        }
+        
+        // Fallback: return all animals with maxScore >= 70
+        return animalScores.filter(a => a.maxScore >= 70).map(a => a.name);
+    }
+
     let state = {
         currentScore: 0,
-        highScore: localStorage.getItem('animalKingdomHighScore') || 0, // Updated Key Name
+        highScore: localStorage.getItem('animalKingdomHighScore') || 0,
         usedCategoryIds: [],
         availableAnimals: [],
         currentAnimal: null,
         isProcessing: false,
-        gameOver: false
+        gameOver: false,
+        gameMode: 'random', // 'random' or 'curated'
+        curatedPool: []
     };
+
+    function setGameMode(mode) {
+        state.gameMode = mode;
+        
+        // Update button styles
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        
+        // Reset game with new mode
+        resetGame();
+    }
 
     function initGame() {
         const grid = document.getElementById('categories-grid');
@@ -204,16 +276,44 @@
             `;
             grid.appendChild(btn);
         });
+        
         document.getElementById('high-score').innerText = state.highScore;
+        
+        // Initialize curated pool
+        state.curatedPool = getCuratedAnimalPool();
+        console.log(`Curated pool has ${state.curatedPool.length} animals`);
+        console.log(`Top animals by max score:`, 
+            state.curatedPool.slice(0, 10).map(name => 
+                `${name} (${getAnimalMaxScore(name)})`
+            ).join(', ')
+        );
+        
         resetGame();
     }
 
     function resetGame() {
         state.currentScore = 0;
         state.usedCategoryIds = [];
-        state.availableAnimals = [...ANIMAL_NAMES];
         state.gameOver = false;
         state.isProcessing = false;
+        
+        // Select animal pool based on game mode
+        if (state.gameMode === 'curated') {
+            // Use only high-scoring animals
+            state.availableAnimals = [...state.curatedPool];
+            
+            // Ensure we have at least 8 animals
+            if (state.availableAnimals.length < 8) {
+                console.warn('Not enough high-scoring animals, using all animals');
+                state.availableAnimals = [...ANIMAL_NAMES];
+            }
+            
+            // Limit to 8 animals for curated mode
+            state.availableAnimals = state.availableAnimals.slice(0, 8);
+        } else {
+            // Random mode: use all animals
+            state.availableAnimals = [...ANIMAL_NAMES];
+        }
         
         document.getElementById('current-score').innerText = '0';
         document.querySelectorAll('.category-card').forEach(card => card.className = 'category-card');
@@ -235,20 +335,16 @@
         state.currentAnimal = state.availableAnimals[randomIndex];
         state.availableAnimals.splice(randomIndex, 1);
         
-        // --- NEW IMAGE LOADING LOGIC ---
         const animalData = GAME_DATA[state.currentAnimal];
         const imgEl = document.getElementById('animal-img');
         const nameEl = document.getElementById('animal-name');
 
         nameEl.innerText = state.currentAnimal;
         
-        // This sets the source to whatever you put in data.js (e.g., "images/lion.jpg")
-        // If image property is missing, it clears the src to prevent broken icons
         if (animalData && animalData.image) {
             imgEl.src = animalData.image;
             imgEl.style.display = 'block';
         } else {
-            // Fallback if you forgot to add an image to data.js
             imgEl.style.display = 'none';
         }
         
@@ -263,7 +359,7 @@
         let maxScore = -1;
 
         for (let cat in scores) {
-            if (cat !== 'image') { // Skip the 'image' key when calculating scores!
+            if (cat !== 'image') {
                 if (!state.usedCategoryIds.includes(cat)) {
                     if (scores[cat] > maxScore) {
                         maxScore = scores[cat];
@@ -312,13 +408,15 @@
 
     function endGame() {
         state.gameOver = true;
+        const modeText = state.gameMode === 'curated' ? ' (Curated Mode)' : '';
+        
         if (state.currentScore > state.highScore) {
             state.highScore = state.currentScore;
             localStorage.setItem('animalKingdomHighScore', state.highScore);
             document.getElementById('high-score').innerText = state.highScore;
-            alert(`🎉 NEW RECORD!\nFinal Score: ${state.currentScore}`);
+            alert(`🎉 NEW RECORD${modeText}!\nFinal Score: ${state.currentScore}`);
         } else {
-            alert(`Game Over!\nFinal Score: ${state.currentScore}`);
+            alert(`Game Over${modeText}!\nFinal Score: ${state.currentScore}`);
         }
     }
 

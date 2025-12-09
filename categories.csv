@@ -1,4 +1,4 @@
-﻿id,name,description
+﻿id,name,desc
 1,Human Deaths,Annual number of human fatalities caused by this animal species (higher score = more dangerous to humans)
 2,Hair Density,Density and coverage of fur/hair on the animal's body (higher score = denser fur/more coverage)
 3,Top Speed,Maximum recorded speed of the animal (higher score = faster movement capability)
@@ -7,3 +7,13 @@
 6,Habitat Extent,Geographic range and area of habitat distribution (higher score = wider distribution across regions)
 7,Relative Strength,Physical strength relative to body size and weight (higher score = stronger pound-for-pound)
 8,Consumption by Humans,Degree to which humans consume this species as food globally (higher score = more heavily consumed)
+9,Captivity Population,"Number of individuals in zoos, aquariums, and captivity worldwide (higher score = more common in captivity)"
+10,Intelligence,"Cognitive abilities, problem-solving, and learning capacity (higher score = more intelligent)"
+11,Cultural Significance,"Importance in human culture, mythology, and symbolism (higher score = more culturally significant)"
+12,Bite Force,Strength of bite measured in PSI or relative power (higher score = stronger bite)
+13,Social Behavior,Degree of social interaction and group living (higher score = highly social/pack animals)
+14,Cuteness Appeal,Subjective appeal and popularity as cute/adorable (higher score = cuter/more beloved)
+15,Adaptability,Ability to thrive in diverse environments and conditions (higher score = highly adaptable)
+16,Economic Value,"Commercial worth including tourism, products, and industry (higher score = higher economic value)"
+17,Conservation Effort,Amount of resources dedicated to protecting the species (higher score = more conservation programs)
+18,Aggression Level,Natural temperament and likelihood of aggressive behavior (higher score = more aggressive)
