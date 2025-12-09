@@ -4311,7 +4311,7 @@ const GAME_CONFIG = {
             "16": 48,
             "17": 92,
             "18": 5,
-            "image": "images/coral.jpg"
+            "image": "images/coral2.jpg"
         }
     }
 };

@@ -39,11 +39,6 @@ yarn-error.log*
 *.temp
 .cache/
 
-# Build Files (if you add build tools later)
-dist/
-build/
-*.min.js
-*.min.css
 
 # Don't ignore these! (They're needed for the game)
 !data.js
