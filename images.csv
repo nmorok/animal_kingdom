@@ -1,0 +1,203 @@
+id,filepath
+Mosquito,images/mosquito.jpg
+Human,images/human.jpg
+Snake,images/snake.jpg
+Dog,images/dog.jpg
+Tsetse Fly,images/tsetse_fly.jpg
+Freshwater Snail,images/freshwater_snail.jpg
+Assassin Bug,images/assassin_bug.jpg
+Ascaris Roundworm,images/ascaris_roundworm.jpg
+Tapeworm,images/tapeworm.jpg
+Crocodile,images/crocodile.jpg
+Hippopotamus,images/hippopotamus.jpg
+Elephant,images/elephant.jpg
+Lion,images/lion.jpg
+Cape Buffalo,images/cape_buffalo.jpg
+Scorpion,images/scorpion.jpg
+Jellyfish,images/jellyfish.jpg
+Tiger,images/tiger.jpg
+Bear,images/bear.jpg
+Leopard,images/leopard.jpg
+Wolf,images/wolf.jpg
+Shark,images/shark.jpg
+Bee,images/bee.jpg
+Wasp,images/wasp.jpg
+Spider,images/spider.jpg
+Ant,images/ant.jpg
+Cheetah,images/cheetah.jpg
+Pronghorn,images/pronghorn.jpg
+Springbok,images/springbok.jpg
+Wildebeest,images/wildebeest.jpg
+Zebra,images/zebra.jpg
+Giraffe,images/giraffe.jpg
+Gorilla,images/gorilla.jpg
+Chimpanzee,images/chimpanzee.jpg
+Orangutan,images/orangutan.jpg
+Rhinoceros,images/rhinoceros.jpg
+Water Buffalo,images/water_buffalo.jpg
+Bison,images/bison.jpg
+Yak,images/yak.jpg
+Moose,images/moose.jpg
+Elk,images/elk.jpg
+Deer,images/deer.jpg
+Reindeer,images/reindeer.jpg
+Caribou,images/caribou.jpg
+Antelope,images/antelope.jpg
+Gazelle,images/gazelle.jpg
+Impala,images/impala.jpg
+Kudu,images/kudu.jpg
+Eland,images/eland.jpg
+Oryx,images/oryx.jpg
+Gemsbok,images/gemsbok.jpg
+Chicken,images/chicken.jpg
+Turkey,images/turkey.jpg
+Duck,images/duck.jpg
+Goose,images/goose.jpg
+Pig,images/pig.jpg
+Sheep,images/sheep.jpg
+Goat,images/goat.jpg
+Cow,images/cow.jpg
+Horse,images/horse.jpg
+Donkey,images/donkey.jpg
+Llama,images/llama.jpg
+Alpaca,images/alpaca.jpg
+Camel,images/camel.jpg
+Dromedary,images/dromedary.jpg
+Kangaroo,images/kangaroo.jpg
+Wallaby,images/wallaby.jpg
+Koala,images/koala.jpg
+Wombat,images/wombat.jpg
+Platypus,images/platypus.jpg
+Echidna,images/echidna.jpg
+Opossum,images/opossum.jpg
+Raccoon,images/raccoon.jpg
+Badger,images/badger.jpg
+Otter,images/otter.jpg
+Beaver,images/beaver.jpg
+Squirrel,images/squirrel.jpg
+Rabbit,images/rabbit.jpg
+Hare,images/hare.jpg
+Guinea Pig,images/guinea_pig.jpg
+Hamster,images/hamster.jpg
+Rat,images/rat.jpg
+Mouse,images/mouse.jpg
+Chinchilla,images/chinchilla.jpg
+Ferret,images/ferret.jpg
+Mink,images/mink.jpg
+Fox,images/fox.jpg
+Jackal,images/jackal.jpg
+Coyote,images/coyote.jpg
+Hyena,images/hyena.jpg
+Warthog,images/warthog.jpg
+Wild Boar,images/wild_boar.jpg
+Peccary,images/peccary.jpg
+Tapir,images/tapir.jpg
+Aardvark,images/aardvark.jpg
+Anteater,images/anteater.jpg
+Sloth,images/sloth.jpg
+Armadillo,images/armadillo.jpg
+Pangolin,images/pangolin.jpg
+Hedgehog,images/hedgehog.jpg
+Porcupine,images/porcupine.jpg
+Skunk,images/skunk.jpg
+Mole,images/mole.jpg
+Shrew,images/shrew.jpg
+Bat,images/bat.jpg
+Peregrine Falcon,images/peregrine_falcon.jpg
+Golden Eagle,images/golden_eagle.jpg
+Bald Eagle,images/bald_eagle.jpg
+Hawk,images/hawk.jpg
+Owl,images/owl.jpg
+Vulture,images/vulture.jpg
+Condor,images/condor.jpg
+Albatross,images/albatross.jpg
+Pelican,images/pelican.jpg
+Cormorant,images/cormorant.jpg
+Heron,images/heron.jpg
+Crane,images/crane.jpg
+Stork,images/stork.jpg
+Flamingo,images/flamingo.jpg
+Swan,images/swan.jpg
+Penguin,images/penguin.jpg
+Ostrich,images/ostrich.jpg
+Emu,images/emu.jpg
+Cassowary,images/cassowary.jpg
+Kiwi,images/kiwi.jpg
+Parrot,images/parrot.jpg
+Macaw,images/macaw.jpg
+Cockatoo,images/cockatoo.jpg
+Toucan,images/toucan.jpg
+Woodpecker,images/woodpecker.jpg
+Hummingbird,images/hummingbird.jpg
+Kingfisher,images/kingfisher.jpg
+Robin,images/robin.jpg
+Sparrow,images/sparrow.jpg
+Pigeon,images/pigeon.jpg
+Dove,images/dove.jpg
+Crow,images/crow.jpg
+Raven,images/raven.jpg
+Magpie,images/magpie.jpg
+Jay,images/jay.jpg
+Seagull,images/seagull.jpg
+Tern,images/tern.jpg
+Puffin,images/puffin.jpg
+Salmon,images/salmon.jpg
+Trout,images/trout.jpg
+Tuna,images/tuna.jpg
+Swordfish,images/swordfish.jpg
+Marlin,images/marlin.jpg
+Shark (Great White),images/shark_great_white.jpg
+Hammerhead Shark,images/hammerhead_shark.jpg
+Tiger Shark,images/tiger_shark.jpg
+Whale Shark,images/whale_shark.jpg
+Orca,images/orca.jpg
+Dolphin,images/dolphin.jpg
+Porpoise,images/porpoise.jpg
+Manatee,images/manatee.jpg
+Seal,images/seal.jpg
+Sea Lion,images/sea_lion.jpg
+Walrus,images/walrus.jpg
+Polar Bear,images/polar_bear.jpg
+Panda,images/panda.jpg
+Grizzly Bear,images/grizzly_bear.jpg
+Black Bear,images/black_bear.jpg
+Sun Bear,images/sun_bear.jpg
+Sloth Bear,images/sloth_bear.jpg
+Spectacled Bear,images/spectacled_bear.jpg
+Red Panda,images/red_panda.jpg
+Meerkat,images/meerkat.jpg
+Mongoose,images/mongoose.jpg
+Civet,images/civet.jpg
+Genet,images/genet.jpg
+Lynx,images/lynx.jpg
+Bobcat,images/bobcat.jpg
+Puma,images/puma.jpg
+Jaguar,images/jaguar.jpg
+Cheetah,images/cheetah.jpg
+Snow Leopard,images/snow_leopard.jpg
+Clouded Leopard,images/clouded_leopard.jpg
+Ocelot,images/ocelot.jpg
+Serval,images/serval.jpg
+Caracal,images/caracal.jpg
+Fishing Cat,images/fishing_cat.jpg
+Leopard Cat,images/leopard_cat.jpg
+Sand Cat,images/sand_cat.jpg
+Black-footed Cat,images/black-footed_cat.jpg
+Rusty-spotted Cat,images/rusty-spotted_cat.jpg
+Octopus,images/octopus.jpg
+Squid,images/squid.jpg
+Cuttlefish,images/cuttlefish.jpg
+Lobster,images/lobster.jpg
+Crab,images/crab.jpg
+Shrimp,images/shrimp.jpg
+Crayfish,images/crayfish.jpg
+Clam,images/clam.jpg
+Oyster,images/oyster.jpg
+Mussel,images/mussel.jpg
+Scallop,images/scallop.jpg
+Snail,images/snail.jpg
+Slug,images/slug.jpg
+Starfish,images/starfish.jpg
+Sea Urchin,images/sea_urchin.jpg
+Sea Cucumber,images/sea_cucumber.jpg
+Coral,images/coral.jpg

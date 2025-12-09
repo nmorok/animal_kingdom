@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animal Kingdom</title>
+    <script src="data.js"></script> 
+    <style>
+        :root {
+            --primary-green: #2ecc71;
+            --dark-green: #27ae60;
+            --jungle-bg: #e8f5e9;
+            --accent-orange: #f39c12;
+            --danger-red: #e74c3c;
+            --text-color: #2c3e50;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--jungle-bg);
+            background-image: radial-gradient(var(--primary-green) 1px, transparent 1px);
+            background-size: 20px 20px;
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* --- Header --- */
+        header { text-align: center; margin-top: 20px; }
+        h1 { color: var(--dark-green); font-size: 3rem; margin-bottom: 5px; text-shadow: 2px 2px 0px #fff; letter-spacing: 2px; }
+        .scoreboard {
+            display: flex; gap: 20px; font-size: 1.2rem; font-weight: bold;
+            background: white; padding: 10px 20px; border-radius: 50px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .score-box span { color: var(--accent-orange); }
+
+        /* --- Game Area --- */
+        #game-container {
+            width: 90%; max-width: 800px; display: flex; flex-direction: column;
+            align-items: center; margin-top: 20px; position: relative;
+        }
+
+        /* Score Popup */
+        #turn-score-popup {
+            position: absolute; top: 30%; left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: var(--accent-orange); color: white;
+            font-size: 3rem; font-weight: 900; padding: 20px 40px;
+            border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            z-index: 50; pointer-events: none; opacity: 0;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #turn-score-popup.active { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+
+        /* Animal Card */
+        .animal-display {
+            background: white; padding: 20px; border-radius: 20px;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1); text-align: center;
+            width: 100%; margin-bottom: 30px; border: 4px solid var(--primary-green);
+            transition: transform 0.3s ease;
+        }
+
+        /* NEW IMAGE STYLING */
+        .animal-image {
+            width: 250px; 
+            height: 250px;
+            object-fit: cover; /* Ensures the image fills the box without stretching */
+            border-radius: 15px;
+            margin: 0 auto 15px auto;
+            display: block;
+            border: 4px solid var(--dark-green);
+            background-color: #eee; /* Light gray background while loading */
+        }
+
+        .animal-name { font-size: 2.5rem; font-weight: 800; color: var(--dark-green); text-transform: uppercase; margin-bottom: 5px; }
+
+        /* Categories Grid */
+        .categories-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 15px; width: 100%;
+        }
+        .category-card {
+            background: var(--card-bg); border-radius: 15px; padding: 15px;
+            cursor: pointer; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.2s ease; border-bottom: 5px solid #ddd;
+            display: flex; flex-direction: column; justify-content: center;
+            align-items: center; min-height: 100px;
+        }
+        .category-card:hover:not(.disabled) { transform: translateY(-5px); border-bottom: 5px solid var(--primary-green); }
+        .category-card.disabled {
+            background-color: #e0e0e0; color: #999; cursor: not-allowed;
+            border-bottom: 5px solid #ccc; transform: none; opacity: 0.6;
+        }
+
+        /* Animations */
+        @keyframes flashGreenAnim {
+            0% { background-color: #fff; transform: scale(1); }
+            50% { background-color: var(--primary-green); color: white; transform: scale(1.1); border-color: var(--dark-green); }
+            100% { background-color: #fff; transform: scale(1); }
+        }
+        @keyframes flashRedAnim {
+            0% { background-color: #fff; transform: scale(1); }
+            50% { background-color: var(--danger-red); color: white; transform: scale(1.1); border-color: #c0392b; }
+            100% { background-color: #fff; transform: scale(1); }
+        }
+        .flash-green { animation: flashGreenAnim 0.8s ease-in-out; }
+        .flash-red { animation: flashRedAnim 0.8s ease-in-out; }
+
+        /* Controls & Utils */
+        .info-icon {
+            position: absolute; top: 5px; right: 8px; font-size: 0.9rem; color: #999;
+            width: 20px; height: 20px; border-radius: 50%; border: 1px solid #999;
+            display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+        }
+        .info-icon:hover { background: var(--accent-orange); color: white; border-color: var(--accent-orange); }
+        .controls { margin-top: 40px; margin-bottom: 20px; }
+        .btn-reset {
+            background-color: #e74c3c; color: white; border: none; padding: 10px 25px;
+            border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 1rem;
+        }
+
+        /* Modal */
+        #description-modal {
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: white; padding: 30px; border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index: 100;
+            max-width: 300px; text-align: center; border: 4px solid var(--accent-orange);
+        }
+        #overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 99;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🦁 ANIMAL KINGDOM</h1>
+    <div class="scoreboard">
+        <div class="score-box">Current: <span id="current-score">0</span></div>
+        <div class="score-box">Best: <span id="high-score">0</span></div>
+    </div>
+</header>
+
+<div id="game-container">
+    <div id="turn-score-popup">+100</div>
+    
+    <div class="animal-display" id="animal-card">
+        <img src="" alt="Animal" class="animal-image" id="animal-img">
+        
+        <div class="animal-name" id="animal-name">Loading...</div>
+        <div style="margin-top:10px; color:#777; font-size: 1rem;">Select the best remaining category!</div>
+    </div>
+
+    <div class="categories-grid" id="categories-grid"></div>
+    <div class="controls">
+        <button class="btn-reset" onclick="resetGame()">Start Over 🔄</button>
+    </div>
+</div>
+
+<div id="overlay" onclick="closeModal()"></div>
+<div id="description-modal">
+    <h3 id="modal-title">Category</h3>
+    <p id="modal-desc">Description goes here.</p>
+    <button onclick="closeModal()" style="margin-top:10px; padding:5px 15px; cursor:pointer;">Close</button>
+</div>
+
+<script>
+    if (typeof GAME_CONFIG === 'undefined') {
+        alert("Error: data.js file not found! Make sure data.js is in the same folder.");
+    }
+
+    const CATEGORIES = GAME_CONFIG.categories;
+    const GAME_DATA = GAME_CONFIG.animals;
+    const ANIMAL_NAMES = Object.keys(GAME_DATA);
+
+    let state = {
+        currentScore: 0,
+        highScore: localStorage.getItem('animalKingdomHighScore') || 0, // Updated Key Name
+        usedCategoryIds: [],
+        availableAnimals: [],
+        currentAnimal: null,
+        isProcessing: false,
+        gameOver: false
+    };
+
+    function initGame() {
+        const grid = document.getElementById('categories-grid');
+        grid.innerHTML = '';
+        
+        CATEGORIES.forEach(cat => {
+            const btn = document.createElement('div');
+            btn.className = 'category-card';
+            btn.id = `cat-${cat.id}`;
+            btn.onclick = () => selectCategory(cat.id);
+            btn.innerHTML = `
+                <div class="info-icon" onclick="showInfo(event, '${cat.name}', '${cat.desc}')">i</div>
+                <strong>${cat.name}</strong>
+            `;
+            grid.appendChild(btn);
+        });
+        document.getElementById('high-score').innerText = state.highScore;
+        resetGame();
+    }
+
+    function resetGame() {
+        state.currentScore = 0;
+        state.usedCategoryIds = [];
+        state.availableAnimals = [...ANIMAL_NAMES];
+        state.gameOver = false;
+        state.isProcessing = false;
+        
+        document.getElementById('current-score').innerText = '0';
+        document.querySelectorAll('.category-card').forEach(card => card.className = 'category-card');
+        nextTurn();
+    }
+
+    function nextTurn() {
+        document.querySelectorAll('.category-card').forEach(card => {
+            card.classList.remove('flash-green', 'flash-red');
+        });
+
+        if (state.usedCategoryIds.length >= CATEGORIES.length || state.availableAnimals.length === 0) {
+            endGame();
+            return;
+        }
+
+        state.isProcessing = false;
+        const randomIndex = Math.floor(Math.random() * state.availableAnimals.length);
+        state.currentAnimal = state.availableAnimals[randomIndex];
+        state.availableAnimals.splice(randomIndex, 1);
+        
+        // --- NEW IMAGE LOADING LOGIC ---
+        const animalData = GAME_DATA[state.currentAnimal];
+        const imgEl = document.getElementById('animal-img');
+        const nameEl = document.getElementById('animal-name');
+
+        nameEl.innerText = state.currentAnimal;
+        
+        // This sets the source to whatever you put in data.js (e.g., "images/lion.jpg")
+        // If image property is missing, it clears the src to prevent broken icons
+        if (animalData && animalData.image) {
+            imgEl.src = animalData.image;
+            imgEl.style.display = 'block';
+        } else {
+            // Fallback if you forgot to add an image to data.js
+            imgEl.style.display = 'none';
+        }
+        
+        const card = document.getElementById('animal-card');
+        card.style.transform = "scale(0.95)";
+        setTimeout(() => card.style.transform = "scale(1)", 200);
+    }
+
+    function getBestCategoryForAnimal(animalName) {
+        const scores = GAME_DATA[animalName];
+        let bestCat = "";
+        let maxScore = -1;
+
+        for (let cat in scores) {
+            if (cat !== 'image') { // Skip the 'image' key when calculating scores!
+                if (!state.usedCategoryIds.includes(cat)) {
+                    if (scores[cat] > maxScore) {
+                        maxScore = scores[cat];
+                        bestCat = cat;
+                    }
+                }
+            }
+        }
+        return { id: bestCat, score: maxScore };
+    }
+
+    function selectCategory(catId) {
+        if (state.gameOver || state.isProcessing) return;
+        if (state.usedCategoryIds.includes(catId)) return;
+
+        state.isProcessing = true;
+
+        const score = GAME_DATA[state.currentAnimal][catId];
+        const bestOption = getBestCategoryForAnimal(state.currentAnimal);
+        const chosenCard = document.getElementById(`cat-${catId}`);
+        const bestCard = document.getElementById(`cat-${bestOption.id}`);
+
+        if (catId === bestOption.id) {
+            chosenCard.classList.add('flash-green');
+        } else {
+            chosenCard.classList.add('flash-red');
+            if(bestCard) bestCard.classList.add('flash-green');
+        }
+
+        showScorePopup(score);
+
+        state.currentScore += score;
+        state.usedCategoryIds.push(catId);
+        document.getElementById('current-score').innerText = state.currentScore;
+        
+        chosenCard.classList.add('disabled');
+        setTimeout(nextTurn, 1200);
+    }
+
+    function showScorePopup(score) {
+        const popup = document.getElementById('turn-score-popup');
+        popup.innerText = `+${score}`;
+        popup.classList.add('active');
+        setTimeout(() => popup.classList.remove('active'), 1000);
+    }
+
+    function endGame() {
+        state.gameOver = true;
+        if (state.currentScore > state.highScore) {
+            state.highScore = state.currentScore;
+            localStorage.setItem('animalKingdomHighScore', state.highScore);
+            document.getElementById('high-score').innerText = state.highScore;
+            alert(`🎉 NEW RECORD!\nFinal Score: ${state.currentScore}`);
+        } else {
+            alert(`Game Over!\nFinal Score: ${state.currentScore}`);
+        }
+    }
+
+    function showInfo(event, title, desc) {
+        event.stopPropagation();
+        document.getElementById('modal-title').innerText = title;
+        document.getElementById('modal-desc').innerText = desc;
+        document.getElementById('description-modal').style.display = 'block';
+        document.getElementById('overlay').style.display = 'block';
+    }
+
+    function closeModal() {
+        document.getElementById('description-modal').style.display = 'none';
+        document.getElementById('overlay').style.display = 'none';
+    }
+
+    initGame();
+</script>
+</body>
+</html>
