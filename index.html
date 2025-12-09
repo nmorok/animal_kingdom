@@ -47,7 +47,10 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-top: 15px;
             flex-wrap: wrap; justify-content: center;
         }
-        .mode-selector label { font-weight: bold; color: var(--text-color); font-size: 0.9rem; }
+        .mode-selector label { 
+            font-weight: bold; color: var(--text-color); font-size: 0.9rem; 
+            margin-right: 5px;
+        }
         .mode-btn {
             padding: 8px 16px; border: 2px solid var(--primary-green);
             background: white; border-radius: 20px; cursor: pointer;
@@ -171,6 +174,11 @@
         <button class="mode-btn" onclick="setGameMode('dangerous')">🐯 Wild & Dangerous</button>
         <button class="mode-btn" onclick="setGameMode('connection')">🐶 Human Connection</button>
     </div>
+    <div class="mode-selector">
+        <label>Animal Pool:</label>
+        <button class="mode-btn pool-btn active" onclick="setPoolMode('random')">🎲 Random</button>
+        <button class="mode-btn pool-btn" onclick="setPoolMode('curated')">🏆 Curated</button>
+    </div>
 </header>
 
 <div id="game-container">
@@ -250,6 +258,26 @@
         return maxScore;
     }
 
+    // Get curated animal pool (animals where 8 picks can reach 600+)
+    function getCuratedAnimalPool() {
+        const animalScores = ANIMAL_NAMES.map(name => ({
+            name: name,
+            maxScore: getAnimalMaxScore(name)
+        }));
+        
+        // Sort by max score descending
+        animalScores.sort((a, b) => b.maxScore - a.maxScore);
+        
+        // Calculate what threshold is needed: 600 / 8 = 75 per pick
+        // Filter animals that can contribute meaningfully (maxScore >= 75)
+        const curatedAnimals = animalScores.filter(a => a.maxScore >= 75);
+        
+        console.log(`Curated pool for ${currentGameMode} mode: ${curatedAnimals.length} animals`);
+        console.log(`Top 10:`, curatedAnimals.slice(0, 10).map(a => `${a.name} (${a.maxScore})`).join(', '));
+        
+        return curatedAnimals.map(a => a.name);
+    }
+
     let state = {
         currentScore: 0,
         highScore: localStorage.getItem('animalKingdomHighScore') || 0,
@@ -257,7 +285,9 @@
         availableAnimals: [],
         currentAnimal: null,
         isProcessing: false,
-        gameOver: false
+        gameOver: false,
+        poolMode: 'random', // 'random' or 'curated'
+        curatedPool: []
     };
 
     function setGameMode(mode) {
@@ -266,15 +296,33 @@
         currentGameMode = mode;
         
         // Update button styles
-        document.querySelectorAll('.mode-btn').forEach(btn => {
+        document.querySelectorAll('.mode-btn:not(.pool-btn)').forEach(btn => {
             btn.classList.remove('active');
         });
         event.target.classList.add('active');
+        
+        // Recalculate curated pool for new mode
+        state.curatedPool = getCuratedAnimalPool();
         
         // Rebuild category grid with new mode's categories
         rebuildCategoryGrid();
         
         // Reset game
+        resetGame();
+    }
+    
+    function setPoolMode(mode) {
+        if (state.isProcessing) return;
+        
+        state.poolMode = mode;
+        
+        // Update button styles
+        document.querySelectorAll('.pool-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        
+        // Reset game with new pool mode
         resetGame();
     }
     
@@ -312,6 +360,9 @@
         // Set high score
         document.getElementById('high-score').innerText = state.highScore;
         
+        // Initialize curated pool
+        state.curatedPool = getCuratedAnimalPool();
+        
         // Start game
         resetGame();
     }
@@ -321,7 +372,23 @@
         state.usedCategoryIds = [];
         state.gameOver = false;
         state.isProcessing = false;
-        state.availableAnimals = [...ANIMAL_NAMES];
+        
+        // Select animal pool based on pool mode
+        if (state.poolMode === 'curated') {
+            // Use only high-scoring animals for current mode
+            state.availableAnimals = [...state.curatedPool];
+            
+            // Ensure we have at least 8 animals
+            if (state.availableAnimals.length < 8) {
+                console.warn('Not enough high-scoring animals, using all animals');
+                state.availableAnimals = [...ANIMAL_NAMES];
+            }
+        } else {
+            // Random mode: use all animals
+            state.availableAnimals = [...ANIMAL_NAMES];
+        }
+        
+        console.log(`Starting game: ${currentGameMode} mode, ${state.poolMode} pool (${state.availableAnimals.length} animals)`);
         
         document.getElementById('current-score').innerText = '0';
         document.querySelectorAll('.category-card').forEach(card => card.className = 'category-card');
