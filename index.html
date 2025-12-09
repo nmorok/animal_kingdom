@@ -241,7 +241,8 @@
         const allowedIds = GAME_MODES[currentGameMode].categoryIds;
         
         for (let catId of allowedIds) {
-            const score = scores[catId.toString()];
+            // Check both string and number versions
+            const score = scores[catId.toString()] || scores[catId];
             if (score !== undefined && score > maxScore) {
                 maxScore = score;
             }
@@ -283,9 +284,13 @@
         
         // Get categories for current mode
         const allowedIds = GAME_MODES[currentGameMode].categoryIds;
-        const modeCategories = GAME_CONFIG.categories.filter(cat => 
-            allowedIds.includes(cat.id)
-        );
+        const modeCategories = GAME_CONFIG.categories.filter(cat => {
+            // Convert both to numbers for comparison (handles string vs number mismatch)
+            const catId = typeof cat.id === 'string' ? parseInt(cat.id) : cat.id;
+            return allowedIds.includes(catId);
+        });
+        
+        console.log(`Found ${modeCategories.length} categories for ${currentGameMode} mode`);
         
         modeCategories.forEach(cat => {
             const btn = document.createElement('div');
@@ -366,9 +371,11 @@
 
         for (let catId of allowedIds) {
             const catIdStr = catId.toString();
-            if (!state.usedCategoryIds.includes(catIdStr)) {
-                if (scores[catIdStr] > maxScore) {
-                    maxScore = scores[catIdStr];
+            if (!state.usedCategoryIds.includes(catIdStr) && !state.usedCategoryIds.includes(catId)) {
+                // Check both string and number versions
+                const score = scores[catIdStr] || scores[catId];
+                if (score !== undefined && score > maxScore) {
+                    maxScore = score;
                     bestCat = catIdStr;
                 }
             }
@@ -378,16 +385,20 @@
 
     function selectCategory(catId) {
         if (state.gameOver || state.isProcessing) return;
-        if (state.usedCategoryIds.includes(catId)) return;
+        
+        // Convert to string for consistent comparison
+        const catIdStr = catId.toString();
+        if (state.usedCategoryIds.includes(catIdStr) || state.usedCategoryIds.includes(catId)) return;
 
         state.isProcessing = true;
 
-        const score = GAME_DATA[state.currentAnimal][catId];
+        // Check both string and number versions for score lookup
+        const score = GAME_DATA[state.currentAnimal][catIdStr] || GAME_DATA[state.currentAnimal][catId];
         const bestOption = getBestCategoryForAnimal(state.currentAnimal);
         const chosenCard = document.getElementById(`cat-${catId}`);
         const bestCard = document.getElementById(`cat-${bestOption.id}`);
 
-        if (catId === bestOption.id) {
+        if (catIdStr === bestOption.id || catId == bestOption.id) {
             chosenCard.classList.add('flash-green');
         } else {
             chosenCard.classList.add('flash-red');
@@ -397,7 +408,7 @@
         showScorePopup(score);
 
         state.currentScore += score;
-        state.usedCategoryIds.push(catId);
+        state.usedCategoryIds.push(catIdStr);
         document.getElementById('current-score').innerText = state.currentScore;
         
         chosenCard.classList.add('disabled');
