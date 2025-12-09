@@ -198,17 +198,23 @@
         alert("Error: data.js file not found! Make sure data.js is in the same folder.");
     }
 
-    const CATEGORIES = GAME_CONFIG.categories;
+    // Only show these 8 categories
+    const ALLOWED_CATEGORY_IDS = [1, 3, 4, 6, 8, 9, 12, 14];
+    // 1=Human Deaths, 3=Top Speed, 4=Lifespan, 6=Habitat Extent, 
+    // 8=Consumption by Humans, 9=Captivity Population, 12=Bite Force, 14=Cuteness
+    
+    const CATEGORIES = GAME_CONFIG.categories.filter(cat => ALLOWED_CATEGORY_IDS.includes(cat.id));
     const GAME_DATA = GAME_CONFIG.animals;
     const ANIMAL_NAMES = Object.keys(GAME_DATA);
 
-    // Calculate max possible score for each animal
+    // Calculate max possible score for each animal (only from allowed categories)
     function getAnimalMaxScore(animalName) {
         const scores = GAME_DATA[animalName];
         let maxScore = 0;
-        for (let cat in scores) {
-            if (cat !== 'image' && scores[cat] > maxScore) {
-                maxScore = scores[cat];
+        for (let catId of ALLOWED_CATEGORY_IDS) {
+            const score = scores[catId.toString()];
+            if (score !== undefined && score > maxScore) {
+                maxScore = score;
             }
         }
         return maxScore;
