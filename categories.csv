@@ -17,3 +17,7 @@
 16,Economic Value,"Commercial worth including tourism, products, and industry (higher score = higher economic value)"
 17,Conservation Effort,Amount of resources dedicated to protecting the species (higher score = more conservation programs)
 18,Aggression Level,Natural temperament and likelihood of aggressive behavior (higher score = more aggressive)
+19,Heaviest,Body mass in kilograms (higher score = heavier animal)
+20,Lightest,Body mass in kilograms (higher score = lighter animal)
+21,Largest,"Length, height, or wingspan in meters (higher score = larger animal)"
+22,Smallest,"Length, height, or wingspan in meters (higher score = smaller animal)"
