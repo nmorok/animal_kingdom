@@ -173,8 +173,9 @@
         <button class="mode-btn active" onclick="setGameMode('classic')">🦁 Classic</button>
         <button class="mode-btn" onclick="setGameMode('dangerous')">🐯 Wild & Dangerous</button>
         <button class="mode-btn" onclick="setGameMode('connection')">🐶 Human Connection</button>
+        <button class="mode-btn" onclick="setGameMode('daily')">📅 Daily Challenge</button>
     </div>
-    <div class="mode-selector">
+    <div class="mode-selector" id="pool-selector">
         <label>Animal Pool:</label>
         <button class="mode-btn pool-btn active" onclick="setPoolMode('random')">🎲 Random</button>
         <button class="mode-btn pool-btn" onclick="setPoolMode('curated')">🏆 Curated</button>
@@ -233,14 +234,130 @@
             // Cuteness, Captivity Population, Cultural Significance, Economic Value,
             // Conservation Effort, Consumption by Humans, Intelligence, Social Behavior
             icon: "🐶"
+        },
+        daily: {
+            name: "Daily Challenge",
+            description: "Same animals and categories for everyone today!",
+            categoryIds: null, // Will be set daily
+            icon: "📅",
+            isDaily: true
         }
     };
 
     // Current game mode (start with classic)
     let currentGameMode = 'classic';
+    let dailyChallenge = null; // Will hold today's daily challenge data
     
     const GAME_DATA = GAME_CONFIG.animals;
     const ANIMAL_NAMES = Object.keys(GAME_DATA);
+
+    // Seeded Random Number Generator (for daily challenges)
+    class SeededRandom {
+        constructor(seed) {
+            this.seed = seed;
+        }
+        
+        next() {
+            this.seed = (this.seed * 9301 + 49297) % 233280;
+            return this.seed / 233280;
+        }
+        
+        shuffle(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(this.next() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+    }
+
+    // Generate today's daily challenge
+    function generateDailyChallenge() {
+        const today = new Date();
+        const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        
+        // Convert date string to seed
+        let seed = 0;
+        for (let i = 0; i < dateStr.length; i++) {
+            seed = (seed * 31 + dateStr.charCodeAt(i)) % 1000000;
+        }
+        
+        const rng = new SeededRandom(seed);
+        
+        // Pick 8 random categories from all 18
+        const allCategoryIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
+        const shuffledCategories = rng.shuffle(allCategoryIds);
+        const selectedCategories = shuffledCategories.slice(0, 8);
+        
+        // Pick 8 random animals from all animals
+        const shuffledAnimals = rng.shuffle(ANIMAL_NAMES);
+        const selectedAnimals = shuffledAnimals.slice(0, 8);
+        
+        console.log(`📅 Daily Challenge for ${dateStr}`);
+        console.log('Categories:', selectedCategories);
+        console.log('Animals:', selectedAnimals);
+        
+        return {
+            date: dateStr,
+            seed: seed,
+            categoryIds: selectedCategories,
+            animalNames: selectedAnimals
+        };
+    }
+
+    // Calculate optimal score for daily challenge
+    function calculateOptimalScore(animals, categoryIds) {
+        let optimalScore = 0;
+        const optimalMoves = [];
+        
+        // For each animal, find its best category from available categories
+        const usedCategories = new Set();
+        const animalScores = [];
+        
+        // Build matrix of scores
+        for (const animal of animals) {
+            const scores = [];
+            for (const catId of categoryIds) {
+                const score = GAME_DATA[animal][catId.toString()] || GAME_DATA[animal][catId] || 0;
+                scores.push({ catId, score });
+            }
+            animalScores.push({ animal, scores });
+        }
+        
+        // Greedy assignment: repeatedly pick the highest remaining score
+        const remainingAnimals = new Set(animals);
+        const remainingCategories = new Set(categoryIds);
+        
+        while (remainingAnimals.size > 0 && remainingCategories.size > 0) {
+            let bestScore = -1;
+            let bestAnimal = null;
+            let bestCategory = null;
+            
+            // Find the best (animal, category) pair
+            for (const animal of remainingAnimals) {
+                for (const catId of remainingCategories) {
+                    const score = GAME_DATA[animal][catId.toString()] || GAME_DATA[animal][catId] || 0;
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestAnimal = animal;
+                        bestCategory = catId;
+                    }
+                }
+            }
+            
+            if (bestAnimal && bestCategory) {
+                optimalScore += bestScore;
+                optimalMoves.push({ animal: bestAnimal, category: bestCategory, score: bestScore });
+                remainingAnimals.delete(bestAnimal);
+                remainingCategories.delete(bestCategory);
+            } else {
+                break;
+            }
+        }
+        
+        return { optimalScore, optimalMoves };
+    }
 
     // Calculate max possible score for each animal (only from current mode's categories)
     function getAnimalMaxScore(animalName) {
@@ -287,7 +404,9 @@
         isProcessing: false,
         gameOver: false,
         poolMode: 'random', // 'random' or 'curated'
-        curatedPool: []
+        curatedPool: [],
+        isDailyMode: false,
+        dailyOptimal: null // Stores optimal score/moves for daily mode
     };
 
     function setGameMode(mode) {
@@ -301,8 +420,28 @@
         });
         event.target.classList.add('active');
         
-        // Recalculate curated pool for new mode
-        state.curatedPool = getCuratedAnimalPool();
+        // Handle daily challenge mode
+        if (mode === 'daily') {
+            state.isDailyMode = true;
+            dailyChallenge = generateDailyChallenge();
+            GAME_MODES.daily.categoryIds = dailyChallenge.categoryIds;
+            
+            // Calculate optimal score for this daily challenge
+            state.dailyOptimal = calculateOptimalScore(dailyChallenge.animalNames, dailyChallenge.categoryIds);
+            console.log(`Optimal score for today: ${state.dailyOptimal.optimalScore}`);
+            
+            // Hide pool selector in daily mode
+            document.getElementById('pool-selector').style.display = 'none';
+        } else {
+            state.isDailyMode = false;
+            state.dailyOptimal = null;
+            
+            // Show pool selector for other modes
+            document.getElementById('pool-selector').style.display = 'flex';
+            
+            // Recalculate curated pool for new mode
+            state.curatedPool = getCuratedAnimalPool();
+        }
         
         // Rebuild category grid with new mode's categories
         rebuildCategoryGrid();
@@ -373,8 +512,14 @@
         state.gameOver = false;
         state.isProcessing = false;
         
-        // Select animal pool based on pool mode
-        if (state.poolMode === 'curated') {
+        // Select animal pool based on mode
+        if (state.isDailyMode && dailyChallenge) {
+            // Use today's fixed animals for daily challenge
+            state.availableAnimals = [...dailyChallenge.animalNames];
+            console.log(`Starting Daily Challenge: ${dailyChallenge.date}`);
+            console.log(`Animals: ${state.availableAnimals.join(', ')}`);
+            console.log(`Optimal possible score: ${state.dailyOptimal.optimalScore}`);
+        } else if (state.poolMode === 'curated') {
             // Use only high-scoring animals for current mode
             state.availableAnimals = [...state.curatedPool];
             
@@ -388,7 +533,7 @@
             state.availableAnimals = [...ANIMAL_NAMES];
         }
         
-        console.log(`Starting game: ${currentGameMode} mode, ${state.poolMode} pool (${state.availableAnimals.length} animals)`);
+        console.log(`Starting game: ${currentGameMode} mode, ${state.isDailyMode ? 'daily challenge' : state.poolMode + ' pool'} (${state.availableAnimals.length} animals)`);
         
         document.getElementById('current-score').innerText = '0';
         document.querySelectorAll('.category-card').forEach(card => card.className = 'category-card');
@@ -408,9 +553,17 @@
         }
 
         state.isProcessing = false;
-        const randomIndex = Math.floor(Math.random() * state.availableAnimals.length);
-        state.currentAnimal = state.availableAnimals[randomIndex];
-        state.availableAnimals.splice(randomIndex, 1);
+        
+        // In daily mode, use animals in fixed order. In other modes, random.
+        let animalIndex;
+        if (state.isDailyMode) {
+            animalIndex = 0; // Always take first animal (they're already in order)
+        } else {
+            animalIndex = Math.floor(Math.random() * state.availableAnimals.length);
+        }
+        
+        state.currentAnimal = state.availableAnimals[animalIndex];
+        state.availableAnimals.splice(animalIndex, 1);
         
         const animalData = GAME_DATA[state.currentAnimal];
         const imgEl = document.getElementById('animal-img');
@@ -491,15 +644,44 @@
 
     function endGame() {
         state.gameOver = true;
-        const modeText = state.gameMode === 'curated' ? ' (Curated Mode)' : '';
         
-        if (state.currentScore > state.highScore) {
-            state.highScore = state.currentScore;
-            localStorage.setItem('animalKingdomHighScore', state.highScore);
-            document.getElementById('high-score').innerText = state.highScore;
-            alert(`🎉 NEW RECORD${modeText}!\nFinal Score: ${state.currentScore}`);
+        if (state.isDailyMode && state.dailyOptimal) {
+            // Show daily challenge results with optimal score
+            const efficiency = Math.round((state.currentScore / state.dailyOptimal.optimalScore) * 100);
+            let message = `📅 Daily Challenge Complete!\n\n`;
+            message += `Your Score: ${state.currentScore}\n`;
+            message += `Optimal Score: ${state.dailyOptimal.optimalScore}\n`;
+            message += `Efficiency: ${efficiency}%\n\n`;
+            
+            if (efficiency === 100) {
+                message += `🏆 PERFECT! You found the optimal solution!`;
+            } else if (efficiency >= 90) {
+                message += `🌟 Excellent! Very close to optimal!`;
+            } else if (efficiency >= 75) {
+                message += `👍 Good job! Room for improvement.`;
+            } else {
+                message += `Keep practicing! Try to maximize each pick.`;
+            }
+            
+            message += `\n\n--- Optimal Solution ---\n`;
+            state.dailyOptimal.optimalMoves.forEach((move, idx) => {
+                const catName = GAME_CONFIG.categories.find(c => c.id == move.category)?.name || `Cat ${move.category}`;
+                message += `${idx + 1}. ${move.animal} → ${catName}: ${move.score}\n`;
+            });
+            
+            alert(message);
         } else {
-            alert(`Game Over${modeText}!\nFinal Score: ${state.currentScore}`);
+            // Regular mode
+            const modeText = state.poolMode === 'curated' ? ' (Curated)' : '';
+            
+            if (state.currentScore > state.highScore) {
+                state.highScore = state.currentScore;
+                localStorage.setItem('animalKingdomHighScore', state.highScore);
+                document.getElementById('high-score').innerText = state.highScore;
+                alert(`🎉 NEW RECORD${modeText}!\nFinal Score: ${state.currentScore}`);
+            } else {
+                alert(`Game Over${modeText}!\nFinal Score: ${state.currentScore}`);
+            }
         }
     }
 
