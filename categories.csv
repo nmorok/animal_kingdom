@@ -1,6 +1,6 @@
 ﻿id,name,desc
 1,Human Deaths,Annual number of human fatalities caused by this animal species (higher score = more dangerous to humans)
-2,Hair Density,Density and coverage of fur/hair on the animal's body (higher score = denser fur/more coverage)
+2,Hair/Feather Density,Density and coverage of fur/hair/feathers on the animal's body (higher score = denser fur/feathers/more coverage)
 3,Top Speed,Maximum recorded speed of the animal (higher score = faster movement capability)
 4,Lifespan,Average or maximum lifespan in years (higher score = longer-lived species)
 5,Population,Current global population size and conservation status (higher score = larger/more stable populations)
