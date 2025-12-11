@@ -1,16 +1,16 @@
 id,filepath
-Mosquito,images/mosquito.jpg
-Human,images/human.jpg
-Snake,images/snake.jpg
-Dog,images/dog.jpg
-Tsetse Fly,images/tsetse_fly.jpg
-Freshwater Snail,images/freshwater_snail.jpg
-Assassin Bug,images/assassin_bug.jpg
-Ascaris Roundworm,images/ascaris_roundworm.jpg
-Tapeworm,images/tapeworm.jpg
-Crocodile,images/crocodile.jpg
-Hippopotamus,images/hippopotamus.jpg
-Elephant,images/elephant.jpg
+Mosquito,https://cdn.pixabay.com/photo/2012/05/18/21/45/mosquito-49141_1280.jpg
+Human,https://cdn.discovermagazine.com/assets/image/52642/Combination-of-faces-humanity-xs.jpg
+Snake,https://cdn.pixabay.com/photo/2020/01/17/18/48/snake-4773742_1280.jpg
+Dog,https://cdn.pixabay.com/photo/2022/08/17/15/46/labrador-7392840_1280.jpg
+Tsetse Fly,https://cdn.pixabay.com/photo/2023/07/22/15/07/robber-fly-8143618_1280.jpg
+Freshwater Snail,https://cdn.pixabay.com/photo/2019/12/22/15/34/snail-4712810_1280.jpg
+Assassin Bug,https://cdn.pixabay.com/photo/2023/11/12/11/05/assassin-insect-8382728_1280.jpg
+Ascaris Roundworm,https://cdn-prod.medicalnewstoday.com/content/images/articles/322/322340/ascaris-lumbricoides-parasitic-worm-causing-ascariasis.jpg
+Tapeworm,https://img.lb.wbmdstatic.com/vim/live/webmd/consumer_assets/site_images/articles/health_tools/what_you_should_know_about_tapeworms_slideshow/1800ss_sciencesource_rm_tapeworm_on_leaf.jpg?resize=728px:*&output-quality=100
+Crocodile,https://cdn.pixabay.com/photo/2014/01/14/18/31/nile-crocodile-245013_1280.jpg
+Hippopotamus,https://cdn.pixabay.com/photo/2018/08/31/10/00/hippo-3644217_1280.jpg
+Elephant,https://cdn.pixabay.com/photo/2013/05/29/22/25/elephant-114543_1280.jpg
 Lion,images/lion.jpg
 Cape Buffalo,images/cape_buffalo.jpg
 Scorpion,images/scorpion.jpg
@@ -42,7 +42,7 @@ Elk,images/elk.jpg
 Deer,images/deer.jpg
 Reindeer,images/reindeer.jpg
 Caribou,images/caribou.jpg
-Antelope,images/antelope.jpg
+Antelope,https://d1jyxxz9imt9yb.cloudfront.net/animal/731/meta_image/regular/AdobeStock_362156363_441361_reduced.jpg
 Gazelle,images/gazelle.jpg
 Impala,images/impala.jpg
 Kudu,images/kudu.jpg
